@@ -1,0 +1,28 @@
+
+> forbole_bot@1.0.0 start /root/bot_monitor/receive
+> micro-bot -e
+
+μ-bot :: Starting @ForboleBot
+μ-bot :: Bot started
+addr: CEAF1E1EE02C1B665AC0F14D2AF58CD235B27AB1
+
+(node:18180) DeprecationWarning: current URL string parser is deprecated, and will be removed in a future version. To use the new parser, pass option { useNewUrlParser: true } to MongoClient.connect.
+Connected...
+addr: E6F1A1C475CF192B28362A47294A00A4F66D8546
+
+Connected...
+addr: E6F1A1C475CF192B28362A47294A00A4F66D8546
+
+Connected...
+updated
+addr: E6F1A1C475CF192B28362A47294A00A4F66D8546
+
+Connected...
+updated
+addr: 4A8E0EB87FD270F3623C2DF6B919F431771BEA8F
+
+Connected...
+addr: 4A8E0EB87FD270F3623C2DF6B919F431771BEA8F
+
+Connected...
+updated
