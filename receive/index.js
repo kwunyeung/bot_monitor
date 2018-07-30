@@ -6,15 +6,15 @@ const exec = util.promisify(require('child_process').exec)
 
 const MongoClient = require('mongodb').MongoClient, test = require('assert');
 
-const uri = "mongodb+srv://sherry:MfsiAta5p@cluster0-2etvy.gcp.mongodb.net/BotData";
-
+//const uri = "mongodb+srv://sherry:MfsiAta5p@cluster0-2etvy.gcp.mongodb.net/BotData";
+const uri = "mongodb://gaiabot:qKS29mHsm63tPk5v@ds151049.mlab.com:51049/gaiabot";
 
 const bot = new Telegraf(process.env.BOT_TOKEN)
 
-const cosvaladdrpattern = RegExp(/cosmosvaladdr[a-z0-9]{39}/)
+const cosvaladdrpattern = RegExp(/^[a-fA-F0-9]{40}$/)
 
 bot.start((ctx) => ctx.reply('Welcome'))
-bot.help((ctx) => ctx.reply('This is a bot that will notify you when something happened in the Forbole chain (fb-001). You have to subscribe validators'))
+bot.help((ctx) => ctx.reply('I am a bot from Forbole that will notify you when something happened to your subscribed validator in the Gaia-7001.'))
 bot.on('sticker', (ctx) => ctx.reply('👍'))
 bot.hears('hi', (ctx) => ctx.reply('Hey there'))
 bot.hears(/buy/i, (ctx) => ctx.reply('buy-buy lol'))
@@ -36,26 +36,26 @@ async function run_cmd(command) {
 }
 
 bot.command('/subscribe', async(ctx, next) => {
-    ctx.reply(`Which validator would you like to subscribe?`)
+    ctx.reply('Which validator would you like to subscribe? Please give me the validator addres in hex.')
     return next(ctx).then(() => {
         var correct = 0
 
-        bot.hears(/^cosmosvaladdr[a-z0-9]{39}$/i, (ctx) => {
+        bot.hears(/^[a-fA-F0-9]{40}$/i, (ctx) => {
             // send address and chat id to mongoDB
             // get charid and valaddr
 
             var chatid = ctx.message.chat.id
             var cosvaladdr = ctx.message.text
-            var cmd_debug = 'fbdebug addr ' + cosvaladdr + ' | grep Address | cut -d " " -f2'
+            //var cmd_debug = 'gaiadebug addr ' + cosvaladdr + ' | grep Address | cut -d " " -f2'
 
-            run_cmd(cmd_debug).then(function(result){
-                valaddr = valaddr.replace(/\n/, '')
+            //run_cmd(cmd_debug).then(function(result){
+                valaddr = cosvaladdr.replace(/\n/, '')
                 MongoClient.connect(uri, function(err, client) {
                     if(err) {
-                        console.log('Error occurred while connecting to MongoDB Atlas...\n',err);
+                        console.log('Error occurred while connecting to MongoDB...\n',err);
                     }
                     console.log('Connected...');
-                    const collection = client.db("BotData").collection("ValAddrID");
+                    const collection = client.db("gaiabot").collection("ValAddrID");
                     // perform actions on the collection object
                     // check if this validator address is already subscribed
                     var query = '{ "chatID": ' + chatid + ', "ValAddr": \"' + valaddr + '\" }'
@@ -76,7 +76,7 @@ bot.command('/subscribe', async(ctx, next) => {
                     }
                 });
 
-            })
+            //})
         })
     })
 });
@@ -88,13 +88,13 @@ bot.command("/mute", async(ctx, next) => {
     cosvaladdr = texts[1]
 
     if (typeof cosvaladdr == 'undefined') {
-        ctx.reply("Usage: /mute [cosmosvaladdress]")
+        ctx.reply("Usage: /mute [validator address in hex]")
     }
     else if (cosvaladdrpattern.test(cosvaladdr)) {
 
-        var cmd_debug = 'fbdebug addr ' + cosvaladdr + ' | grep Address | cut -d " " -f2'
-        run_cmd(cmd_debug).then(function(result){
-            valaddr = valaddr.replace(/\n/, '')
+        //var cmd_debug = 'gaiadebug addr ' + cosvaladdr + ' | grep Address | cut -d " " -f2'
+        //run_cmd(cmd_debug).then(function(result){
+            valaddr = cosvaladdr.replace(/\n/, '')
 
             // if (cosvaladdrpattern.test(cosvaladdr)) {
             // if validatoraddr exists in the db, change mute to true
@@ -103,7 +103,7 @@ bot.command("/mute", async(ctx, next) => {
                     console.log('Error occurred while connecting to MongoDB Atlas...\n',err);
                 }
                 console.log('Connected...');
-                const collection = client.db("BotData").collection("ValAddrID");
+                const collection = client.db("gaiabot").collection("ValAddrID");
 
                 var query = '{ "chatID": ' + chatid + ', "ValAddr": \"' + valaddr + '\" }'
                 var newvalue = { $set: {mute: true} }
@@ -122,7 +122,7 @@ bot.command("/mute", async(ctx, next) => {
                     ctx.reply("You didn't subscribe validator " + cosvaladdr + " yet")
                 }
             });
-        })
+        //})
     } else {
         ctx.reply("Wrong validator address, cannot be muted")
     }
@@ -135,22 +135,22 @@ bot.command("/unmute", async(ctx, next) => {
     cosvaladdr = texts[1]
 
     if (typeof cosvaladdr == 'undefined') {
-        ctx.reply("Usage: /unmute [cosmosvaladdress]")
+        ctx.reply("Usage: /unmute [validator address in hex]")
     }
     else if (cosvaladdrpattern.test(cosvaladdr)) {
 
-        var cmd_debug = 'fbdebug addr ' + cosvaladdr + ' | grep Address | cut -d " " -f2'
-        run_cmd(cmd_debug).then(function(result){
-            valaddr = valaddr.replace(/\n/, '')
+        //var cmd_debug = 'gaiadebug addr ' + cosvaladdr + ' | grep Address | cut -d " " -f2'
+        //run_cmd(cmd_debug).then(function(result){
+            valaddr = cosvaladdr.replace(/\n/, '')
 
             // if (cosvaladdrpattern.test(cosvaladdr)) {
             // if validatoraddr exists in the db, change mute to true
             MongoClient.connect(uri, function(err, client) {
                 if(err) {
-                    console.log('Error occurred while connecting to MongoDB Atlas...\n',err);
+                    console.log('Error occurred while connecting to MongoDB...\n',err);
                 }
                 console.log('Connected...');
-                const collection = client.db("BotData").collection("ValAddrID");
+                const collection = client.db("gaiabot").collection("ValAddrID");
 
                 var query = '{ "chatID": ' + chatid + ', "ValAddr": \"' + valaddr + '\" }'
                 var newvalue = { $set: {mute: false} }
@@ -169,7 +169,7 @@ bot.command("/unmute", async(ctx, next) => {
                     ctx.reply("You didn't subscribe validator " + cosvaladdr + " yet")
                 }
             });
-        })
+        //})
     } else {
         ctx.reply("Wrong validator address, cannot be muted")
     }

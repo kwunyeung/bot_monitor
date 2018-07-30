@@ -9,11 +9,13 @@ import requests
 import time
 from requests_futures.sessions import FuturesSession
 
-db = MongoClient("mongodb+srv://sherry:MfsiAta5p@cluster0-2etvy.gcp.mongodb.net/BotData")
-client = db.BotData
+#db = MongoClient("mongodb+srv://sherry:MfsiAta5p@cluster0-2etvy.gcp.mongodb.net/BotData")
+db = MongoClient("mongodb://gaiabot:qKS29mHsm63tPk5v@ds151049.mlab.com:51049/gaiabot")
+client = db.gaiabot
 collection = client.ValAddrID
 
-KEY="606247002:AAFn1i4I5QlevDMTP7gS22t1GpaBrUYku3s"
+#KEY="606247002:AAFn1i4I5QlevDMTP7gS22t1GpaBrUYku3s"
+KEY="695435732:AAEAIO3cJMy85jwF7pUtUKXCo9-BX5vAF-w"
 TIME="10"
 URL="https://api.telegram.org/bot" + KEY + "/sendMessage"
 
@@ -21,7 +23,7 @@ j = journal.Reader()
 j.this_boot()
 j.seek_tail()
 j.log_level(journal.LOG_INFO)
-j.add_match(_SYSTEMD_UNIT="forboled.service")
+j.add_match(_SYSTEMD_UNIT="gaiad.service")
 
 chatidset = set()
 
@@ -39,16 +41,16 @@ try:
 
         if (matchAbsent):
             valAddr = matchAbsent.group(1)
-
+            print("Absent: "+entry["MESSAGE"])
         elif (matchMinHeight):
-#            print(entry["MESSAGE"])
+            print("MinHeight: "+entry["MESSAGE"])
             valAddr = matchMinHeight.group(1)
 
         elif (matchReduced):
-#            print(entry["MESSAGE"])
+            print("Reduced: "+entry["MESSAGE"])
             valAddr = matchReduced.group(1)
         elif (matchRevoke):
-#            print(entry["MESSAGE"])
+            print("Revoke: "+entry["MESSAGE"])
             valAddr = matchRevoke.group(1)
         else:
             break
@@ -72,7 +74,7 @@ try:
         # if there are chatids, run the bash script to send message
         session = FuturesSession()
         for id in chatids:
-             session.get("https://api.telegram.org/bot606247002:AAFn1i4I5QlevDMTP7gS22t1GpaBrUYku3s/sendMessage?chat_id=" + id + "&text=" + msg)
+             session.get("https://api.telegram.org/bot695435732:AAEAIO3cJMy85jwF7pUtUKXCo9-BX5vAF-w/sendMessage?chat_id=" + id + "&text=" + msg)
         end = time.time()
         print("time: ", end-start)
         chatidset = set()
